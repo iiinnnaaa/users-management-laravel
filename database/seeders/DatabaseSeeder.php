@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@example.com',
             'password' => 'password',
             'role' => User::ROLE_ADMIN,
+            'is_verified' => true,
         ]);
 
         User::factory()->create([
@@ -21,6 +22,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'user@example.com',
             'password' => 'password',
             'role' => User::ROLE_USER,
+            'is_verified' => true,
         ]);
     }
 }

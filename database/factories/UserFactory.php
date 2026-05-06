@@ -16,6 +16,7 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'password' => 'password',
             'role' => User::ROLE_USER,
+            'is_verified' => true,
         ];
     }
 }

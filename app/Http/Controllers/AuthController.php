@@ -6,6 +6,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Services\Auth\AuthTokenService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -13,6 +14,11 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    public function __construct(
+        protected AuthTokenService $authTokens
+    ) {
+    }
+
     public function register(RegisterRequest $request): JsonResponse
     {
         $user = User::create([
@@ -20,13 +26,14 @@ class AuthController extends Controller
             'email' => $request->validated('email'),
             'password' => $request->validated('password'),
             'role' => User::ROLE_USER,
+            'is_verified' => false,
         ]);
 
-        $token = $user->createToken('auth')->plainTextToken;
+        $this->authTokens->issueRegistrationOtp($user);
 
         return response()->json([
-            'user' => new UserResource($user),
-            'token' => $token,
+            'message' => __('Registration successful. Verify your email with the code we sent.'),
+            'user' => new UserResource($user->fresh()),
         ], Response::HTTP_CREATED);
     }
 
@@ -43,6 +50,11 @@ class AuthController extends Controller
             ], Response::HTTP_UNAUTHORIZED);
         }
 
+        if (! $user->is_verified) {
+            return response()->json([
+                'message' => __('Your email address is not verified.'),
+            ], Response::HTTP_FORBIDDEN);
+        }
         $token = $user->createToken('auth')->plainTextToken;
 
         return response()->json([

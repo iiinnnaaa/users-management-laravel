@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'is_verified',
     ];
 
     protected $hidden = [
@@ -32,6 +33,12 @@ class User extends Authenticatable
     {
         return [
             'password' => 'hashed',
+            'is_verified' => 'boolean',
         ];
+    }
+
+    public function authTokens(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AuthToken::class);
     }
 }

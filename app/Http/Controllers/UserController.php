@@ -34,6 +34,7 @@ class UserController extends Controller
             'email' => $request->validated('email'),
             'password' => $request->validated('password'),
             'role' => $request->validated('role'),
+            'is_verified' => true,
         ]);
 
         return (new UserResource($user))->response()->setStatusCode(Response::HTTP_CREATED);
